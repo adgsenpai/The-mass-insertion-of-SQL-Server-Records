@@ -8,11 +8,12 @@
 \graphicspath{{images/}}
 \setcounter{tocdepth}{4}
 \setcounter{secnumdepth}{4}
+\usepackage{listings}
 
 
-\title{LaTeX Template}
+\title{The Mass Insertion of SQL Server Records Algorithm}
 
-\author{Mr Ashlin Darius Govindasamy\\ \large{ADGSTUDIOS}}
+\author{Mr Ashlin Darius Govindasamy\\ \large{University of South Africa}}
 
 \date{\today}
 
@@ -21,14 +22,18 @@
 \maketitle
 \newpage
 
+\begin{abstract}
+    This paper presents a new algorithm for the mass insertion of records into a SQL Server database and it can handle any dataframe which pandas supports. Instead of using the traditional method of inserting records one by one, this algorithm uses the bulk insert method which is much faster. The algorithm is written in Python and it is tested on a dataset of 1 million records.
+\end{abstract}
+
 \tableofcontents
 
 %for adding page numbers
 \pagenumbering{arabic} 
 
 %add more chapters like this
-\chapter{Introduction}
-\input{chapters/introduction.tex}
+\chapter{Approach}
+\input{chapters/approach.tex}
 
 \newpage
 
