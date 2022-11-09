@@ -38,7 +38,12 @@
 \newpage
 
 \begin{abstract}
-    This paper presents a new algorithm for the mass insertion of records into a SQL Server database and it can handle any dataframe which pandas supports. Instead of using the traditional method of inserting records one by one, this algorithm uses the bulk insert method which is much faster. The algorithm is written in Python and it is tested on a dataset of 1 million records.
+    This paper presents a new algorithm for the mass insertion of records into a SQL Server database and it can handle any file extension which pandas supports.
+    There is a problem with the current method of inserting records into a SQL Server database. We are only limited to .csv, .txt files in the SQL Server Management Studio Import Flat File Wizard.
+    The algorithm is written in Python and it can handle any file extension which pandas supports.
+    It is proven that the SQL Server Management Studio Import Flat File Wizard is $2.18$ times faster than the algorithm but that is only for one file.
+    When having $n$ number of files and automation is required then my algorithm is the way to go. I own the $sqlserver$ module on PyPI.
+    It simplifies $PyODBC$ module and it is a wrapper around the $PyODBC$ module. In this paper I will show how to use the $sqlserver$ module to insert records into a SQL Server database and also explain the algorithm to commit the records into the database.
 \end{abstract}
 
 \tableofcontents
