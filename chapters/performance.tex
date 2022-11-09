@@ -1,0 +1,172 @@
+\subsection{Testing the performance of the bulk .csv insertion commit}
+
+We will use a dataset called $baby-names.csv$ which contains the names of babies born in the United States from 1880 to 2014. The dataset is available at \url{https://raw.githubusercontent.com/hadley/data-baby-names/master/baby-names.csv}
+
+It consists of $n$ rows and $m$ columns. The columns are $year$, $name$, $percent$ and $sex$. \\
+
+And $n$ is the number of rows in the dataset which is $258000$. \\
+
+In this case we will use the $n$ rows to test the performance of the bulk .csv insertion commit. \\
+
+We will run two tests: \\
+
+1. Native SQL Server Management Studio and the bulk .csv insertion commit. \\
+2. Our Python script and the bulk .csv insertion commit using $sqlserver$ module. \\
+
+I will be using my laptop to run the tests. \\
+
+My system configuration is as follows: \\
+\begin{itemize}
+\item Processor	Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz, 2496 Mhz, 4 Core(s), 8 Logical Processor(s)
+\item Installed Physical Memory (RAM)	8.0 GB
+\item 512GB NVMe SSD
+\end{itemize}
+
+The database will be hosted locally on my laptop. \\
+The database will be hosted on the same machine as the Python script. \\
+I will be using SQL Server 2019 Developer Edition. \\
+
+Using the $app.py$ i created using my Python script, i will be inserting the $n$ rows into the database. \\
+
+The code for the $app.py$ is as follows: \\
+\begin{verbatim}
+import sqlserver
+import time
+connectionstring = 'Driver={ODBC Driver 17 for SQL Server};Server=(local);Database=ADGSTUDIOS;
++Trusted_Connection=yes;'
+db = sqlserver.adgsqlserver(connectionstring)
+
+path = r'C:\Users\adgru\Code\datasets\babynames.csv'
+start = time.time()
+print('Creating table')
+db.CreateCSVTable(path)
+print('Table created')
+print('Time taken to create table: ', time.time() - start)
+print('inserting data')
+db.InsertCSVData(path)
+print('Data inserted')
+print('Time taken to insert data: ', time.time() - start)
+end = time.time()
+# print time in seconds
+print('Total time taken: ', end - start)
+\end{verbatim}
+
+When running the $app.py$ i get the following stdoutput: \\
+\begin{verbatim}
+Table created
+Time taken to create table:  0.1863565444946289
+inserting data
+Data inserted
+Time taken to insert data:  63.31948184967041
+Total time taken:  63.31948184967041
+\end{verbatim}
+
+Quite interestingly, the time taken to create the table is $0.1863565444946289$ seconds. \\
+The time taken to insert the data is $63.31948184967041$ seconds. \\
+The total time taken is $63.31948184967041$ seconds. \\
+
+It is amazingly to see that thte total time taken = time taken to insert data. \\
+This is because the time taken to create the table is negligible. \\
+But in some cases the time taken to create the table can be significant. \\
+As there could be a delay in transaction query processing. \\
+
+Now we will test the performance of the bulk .csv insertion commit using SQL Server Management Studio. \\
+
+The steps to test the performance of the bulk .csv insertion commit using SQL Server Management Studio are as follows: \\
+\begin{enumerate}
+\item Open SQL Server Management Studio.
+\item Connect to the database.
+\item Import Flat File Wizard.
+\item Select the $baby-names.csv$ file.
+\item Select the $dbo$ schema.
+\item Create a new table.
+\item Process the file and import the data.
+\end{enumerate}
+
+In this experiment we only calculate the processing time. Using the GUI to input settings is not included in the processing time. \\
+It is important to note that the processing time is the time taken to import the data and commit the transaction. \\
+By using a stop watch. \\
+There might be human error in the stop watch. \\
+But the difference in the time taken will be negligible. \\
+
+Note that sql set the following scheme for the table: \\
+\begin{verbatim}
+    year:smallint
+    name:nvarchar(50)
+    percent:float
+    sex:nvarchar(50)
+\end{verbatim}
+
+But wait in few seconds i run the job. It crashes. The input string is not in the correct format. \\
+
+I set all the columns to $nvarchar(max)$. \\
+\begin{verbatim}
+    year:nvarchar(max)
+    name:nvarchar(max)
+    percent:nvarchar(max)
+    sex:nvarchar(max)
+\end{verbatim}
+
+The job runs successfully and the $t$ taken to process the file was $29.17$ seconds. \\
+Thats cool! Well done SQL Server Management Studio. \\
+
+Lets compare the performance of the bulk .csv insertion commit using SQL Server Management Studio and the bulk .csv insertion commit using $sqlserver$ module. \\
+
+%render table of performance
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Platform} & \textbf{$t$} \\
+\hline
+SQL Server Management Studio Import Flat File & 29.17 seconds \\
+\hline
+Python $sqlserver$ module & 63.32 seconds \\
+\hline
+\end{tabular}
+\caption{Performance of the bulk .csv insertion commit using SQL Server Management Studio and the bulk .csv insertion commit using $sqlserver$ module}
+\label{tab:performance}
+\end{table}
+
+
+
+
+The SQL Server Management Studio is $2.18$ times faster than the $sqlserver$ module. \\
+Quite interestingly, the $sqlserver$ module is $2.18$ times slower than the SQL Server Management Studio. \\
+
+But wait, surely in the future we can beat the performance of SQL Server Management Studio. Will just have to engineer the $sqlserver$ module more efficiently. \\
+
+For now we take the win, because we dont have to go to the GUI multiple times to set the settings. \\
+And we can automate the process for $n$ number of files. \\
+
+Imagine using the SQL Server Management Studio to import $n$ number of files. \\
+That will be super tedious. \\
+
+Sometimes the SQL Server Management Studio Import Flat File Wizard crashes when importing a large file or fails.
+
+If the invalid datatypes are set in the table. You will have to manually change the datatypes for each column $m$. \\
+This is not efficient the time spending on the GUI will be significant. \\
+
+In overall if you got a large dataset and you want to import it into a database and its only one file.
+Then the SQL Server Management Studio Import Flat File Wizard is the way to go and make sure you set the correct datatypes. \\
+But if you got datasets and you want to import it into a database then the $sqlserver$ module is the way to go. \\
+You can automate the process for $n$ number of files. \\
+
+My final point is that the SQL Server Management Studio only allows the \\ 
+$fileExt$ $\in$ ${[.csv, .txt]}$ where as my $sqlserver$ module takes any file type pandas supports.
+
+Was a cool experiment. I am glad with the results. \\
+
+Feel free to use the $sqlserver$ module and as well contribute to the module on GitHub. \\
+I am open to any suggestions and feedback. \\
+
+
+
+
+
+
+
+
+
+
+

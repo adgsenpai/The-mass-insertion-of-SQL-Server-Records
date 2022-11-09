@@ -10,6 +10,21 @@
 \setcounter{secnumdepth}{4}
 \usepackage{listings}
 
+\newenvironment{FVerbatim}
+ {\VerbatimEnvironment
+  \begin{lrbox}{\FVerbatimbox}%
+  \begin{BVerbatim}}
+ {\end{BVerbatim}\end{lrbox}%
+  \framebox[\FVerbatimwidth][l]{\usebox{\FVerbatimbox}}}
+
+\newsavebox{\FVerbatimbox}
+\newlength{\FVerbatimwidth}
+\AtBeginDocument{%
+  \sbox0{\ttfamily X}%
+  \setlength{\FVerbatimwidth}{60\wd0}%
+  \addtolength{\FVerbatimwidth}{2\fboxsep}% for framebox
+}
+
 
 \title{The Mass Insertion of SQL Server Records Algorithm}
 
@@ -34,6 +49,12 @@
 %add more chapters like this
 \chapter{Approach}
 \input{chapters/approach.tex}
+
+\chapter{Usage}
+\input{chapters/usage.tex}
+
+\chapter{Performance}
+\input{chapters/performance.tex}
 
 \newpage
 

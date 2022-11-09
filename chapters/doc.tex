@@ -1,0 +1,209 @@
+\hypertarget{installation-for-linux-guys}{%
+\subsection{Installation for linux
+guys}\label{installation-for-linux-guys}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+
+\item
+  Install a driver for your linux machine!
+\item
+  I recommend \texttt{FreeTDS}
+\end{enumerate}
+
+\hypertarget{installing-freetds}{%
+\subsubsection{\texorpdfstring{Installing
+\texttt{FreeTDS}}{Installing FreeTDS}}\label{installing-freetds}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+
+\item
+  Install pre-requisite packages
+\end{enumerate}
+
+\begin{verbatim}
+sudo apt-get install unixodbc unixodbc-dev freetds-dev freetds-bin tdsodbc
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+
+\item
+  Point \texttt{odbcinst.ini} to the driver in
+  \texttt{/etc/odbcinst.ini}
+\end{enumerate}
+
+\begin{verbatim}
+[FreeTDS]
+Description = v0.91 with protocol v7.2
+Driver = MYDRIVERPATH
+\end{verbatim}
+
+where \texttt{MYDRIVERPATH} is the path of the \texttt{libtdsodbc.so}
+file
+
+Hint! Look in the \texttt{/usr/lib/mylinuxdistro/odbc} folder! Will
+implement script in the future to install/automate this for linux
+solutions.
+
+\begin{verbatim}
+pip install sqlserver
+\end{verbatim}
+
+\hypertarget{installation-for-windows-guys}{%
+\subsection{Installation for windows
+guys}\label{installation-for-windows-guys}}
+
+\begin{verbatim}
+pip install sqlserver
+\end{verbatim}
+
+\hypertarget{example-of-connectionstring}{%
+\paragraph{Example of
+ConnectionString}\label{example-of-connectionstring}}
+
+\begin{verbatim}
+DRIVERS = db.ReturnDrivers()
+# output of drivers
+['SQL Server', 'ODBC Driver 17 for SQL Server', 
+'SQL Server Native Client 11.0', 'SQL Server Native Client RDA 11.0'
+, 'Microsoft Access Driver (*.mdb, *.accdb)', 
+'Microsoft Excel Driver (*.xls, *.xlsx, *.xlsm, *.xlsb)',
+ 'Microsoft Access Text Driver (*.txt, *.csv)']
+
+# We can use a SQL ODBC Driver or FreeTDS
+DRIVER={ODBC Driver 17 for SQL Server};SERVER=SERVERNAME,PORT;DATABASE=DB;
+UID=USERNAME;PWD=PASSWORD
+\end{verbatim}
+
+\hypertarget{usage}{%
+\subsection{Usage}\label{usage}}
+
+\hypertarget{initialization}{%
+\subsubsection{Initialization}\label{initialization}}
+
+\begin{verbatim}
+import sqlserver
+db = sqlserver.adgsqlserver('yourconnectionstring')
+\end{verbatim}
+
+\hypertarget{commands}{%
+\subsubsection{Commands}\label{commands}}
+
+\hypertarget{execute-query}{%
+\paragraph{Execute Query}\label{execute-query}}
+
+\texttt{parms}: ExecuteQuery(query:str)
+
+This enables you to execute any query without any \texttt{stdout} but
+returns a \texttt{bool} \texttt{True} or \texttt{False} if query passes
+and logs \texttt{exception} in terminal as \texttt{stdout}.
+
+\begin{verbatim}
+query = 'somequery'
+db.ExecuteQuery()
+\end{verbatim}
+
+\hypertarget{return-query-as-dictionary}{%
+\paragraph{Return Query as
+Dictionary}\label{return-query-as-dictionary}}
+
+\texttt{parms}: GetRecordsAsDict(query:str)
+
+We use this for \texttt{select} statements or any other query that
+returns a \texttt{table} as a result.
+
+\begin{verbatim}
+query = "SELECT 'Connection Passed' AS Result"
+db.GetRecordsAsDict(query)
+\end{verbatim}
+
+\texttt{stdout}
+
+\begin{verbatim}
+{'results': [{'Result': 'Connection Passed'}]}
+\end{verbatim}
+
+\hypertarget{return-query-as-column-list}{%
+\paragraph{Return Query as Column
+List}\label{return-query-as-column-list}}
+
+\texttt{parms}: GetRecordsOfColumn(query:str,ColumnName:str)
+
+We use this for \texttt{select} statements or any other query that
+returns a \texttt{table} as a result.
+
+\begin{verbatim}
+db.GetRecordsOfColumn("SELECT 'Connection Passed' AS Result", "Result")
+\end{verbatim}
+
+\texttt{stdout}
+
+\begin{verbatim}
+['Connection Passed']
+\end{verbatim}
+
+\hypertarget{create-csv-table-schema}{%
+\paragraph{Create CSV Table Schema}\label{create-csv-table-schema}}
+
+\texttt{parms}: CreateCSVTable(csvfile:str)
+
+Creates a SQL Table with varchar(max) columns such that it can be ready
+to be inserted to based on the .csv column names
+
+Assumption: \texttt{somefile.csv}
+
+\begin{verbatim}
+name,surname,phonenumber
+test,testor,01234567810
+\end{verbatim}
+
+\begin{verbatim}
+path = 'C:/somefile.csv'
+db.CreateCSVTable(path)
+\end{verbatim}
+
+In SQL Table \texttt{somefile.dbo}
+
+\begin{verbatim}
+|name|surname|phonenumber|
+\end{verbatim}
+
+\hypertarget{insert-csv-table}{%
+\paragraph{Insert CSV Table}\label{insert-csv-table}}
+
+\texttt{parms}: InsertCSVTable(csvfile:str)
+
+Assumption: \texttt{somefile.csv}
+
+\begin{verbatim}
+name,surname,phonenumber
+test,testor,01234567810
+\end{verbatim}
+
+\begin{verbatim}
+path = 'C:/somefile.csv'
+db.InsertCSVTable(path)
+\end{verbatim}
+
+In SQL Table \texttt{somefile.dbo}
+
+\begin{verbatim}
+--------------------------
+|name|surname|phonenumber|
+|----|-------|-----------|
+|test|testor |01234567810|
+--------------------------
+\end{verbatim}
+
+\hypertarget{insert-xml}{%
+\paragraph{Insert XML}\label{insert-xml}}
+
+\texttt{parms}: InsertXMLSQLTable(xmlfilepath:str)
+
+\begin{verbatim}
+xmlfilepath = 'C:/somexml.xml'
+db.InsertXMLSQLTable(xmlfilepath)
+\end{verbatim}

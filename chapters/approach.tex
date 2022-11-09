@@ -36,7 +36,6 @@ We iterate through the columns in the dataframe and we append the column name an
 
 Then we inject the tuple into the $queryBuffer$ and we append a comma to the $queryBuffer$ else if the column is the last column in the dataframe we append a closing bracket to the $queryBuffer$. \\
 
-
 \begin{equation}
 payload = \sum_{i=1}^{m} 
 \begin{cases}
@@ -44,6 +43,10 @@ payload = \sum_{i=1}^{m}
     ([col_{i}] varchar(max)) & \text{if } i = m    
 \end{cases}
 \end{equation}
+
+First we check if the table exists in the database. If the table exists we drop the table. \\
+
+Then we create the table with the name $tableName$ and the columns are the $m$ columns names in the dataframe. \\
 
 %inject code
 \begin{verbatim} 
@@ -184,25 +187,4 @@ In any case if it fails the algorithm will safely continue to insert the records
 But skips the records that failed the query limit. \\ 
 And a query error will be in the stdout. \\
 
-If i reach the query limit someday i will re-engineer the algorithm to insert the records in batches. As per by finding the query limit by bruteforce.
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
- 
-
+If i reach the query limit someday i will re-engineer the algorithm to insert the records in batches. As per by finding the query limit by bruteforce. \\
